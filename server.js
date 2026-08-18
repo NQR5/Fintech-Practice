@@ -34,7 +34,7 @@ app.get("/api/accounts", (req,res)=>{
     
     if(minbalance){
         const accmin = accounts.filter(a => a.balance >=  minbalance)
-        return res.json({accounts_minbalanced: accmin })
+        return res.status(200).json({accounts_minbalanced: accmin })
     }
    const all = accounts.map(acc =>({
     name :acc.name ,
@@ -49,7 +49,7 @@ app.get("/api/account/:id",(req,res)=>{
     if(!account){
         return res.json({massge : "The account is not here "})
     }
-    return res.json({massge : `The account data is: name : ${account.name} -- id : ${account.id} -- balance : ${account.balance}`})   
+    return res.json({massge : `The account data is: name : ${account.name} -- id : ${account.id}  - balance : ${account.balance}`})   
 })
 
 app.post("/api/account", (req,res)=>{
@@ -75,9 +75,23 @@ app.put('/api/transision/:id' ,(req,res )=>{
     if( balance && from.balance >= balance && to){
     from.balance -= balance
     to.balance += balance
-    return res.json({massege: to})
+    return res.status(200).json({massege:  `Your accounts now is ${from.balance} and deposit to ${to.name} with ${to.balance}`})
     }
-    return res.status(200).json({massege: `Your accounts now is ${from.balance} and trans to ${to.name} with ${to.balance}`})
+    return res.status(200).json({massege:`Sorry there is a problem `})
+})
+
+app.put("/api/accounts/:id/withdraw", (req,res )=>{
+    const Id = req.params.id;
+    const {amount } = req.body;
+    const acc = accounts.find(a => a.id == Id)
+    if(acc){
+        if(acc.balance < amount){
+            return res.status(400).json({massege: `Your account doesn't have this money , this in your account : ${acc.balance} `})
+    }
+    acc.balance -= amount
+    return res.status(200).json({massege: `take the cash and there is the rest in your account ${acc.balance} `})
+    }
+    return res.status(400).json({massege: `the account is not here`})
 })
 app.listen(PORT,()=>{
     console.log(`server is listing right now on port ${PORT}` );
