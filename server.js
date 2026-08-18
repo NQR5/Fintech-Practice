@@ -4,7 +4,7 @@ const PORT = 3000
 
 app.use(express.json());
 
-const accounts = [
+let accounts = [
     {
         id:1,
         name:"nawaf",
@@ -92,6 +92,16 @@ app.put("/api/accounts/:id/withdraw", (req,res )=>{
     return res.status(200).json({massege: `take the cash and there is the rest in your account ${acc.balance} `})
     }
     return res.status(400).json({massege: `the account is not here`})
+})
+
+app.delete("/api/accounts/:id",(req,res)=>{
+    const Id = req.params.id;
+    const acc = accounts.find(a => a.id== Id);
+    if(acc ){
+       accounts = accounts.filter(acc => acc.id != Id )
+       return res.status(200).json({massege: `the delete is Done with this account id: ${acc.id} and name : ${acc.name}`}) 
+    }
+    return res.status(400).json({massege: `Not Found`})
 })
 app.listen(PORT,()=>{
     console.log(`server is listing right now on port ${PORT}` );
