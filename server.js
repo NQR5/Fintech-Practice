@@ -1,9 +1,11 @@
 import express from "express";
 import mongoose from "mongoose";
 import jwt from "jsonwebtoken"
+import User from "./Models/User.js"
+
 const app = express();
 const PORT = 3000
-const mon = mongoose.connect("mongodb://localhost:27017/test").then(()=>console.log("DB is ready"))
+const mon = mongoose.connect("mongodb://localhost:27017/digitalWalet").then(()=>console.log("DB is ready"))
 app.use(express.json());
 
 let accounts = [
@@ -31,18 +33,25 @@ app.get("/", (req,res)=>{
     res.json({massege:"The get is working right now"})
 })
 
-app.get("/api/accounts", (req,res)=>{
+app.get("/api/accounts",async (req,res)=>{
     const {minbalance }= req.query;
     
     if(minbalance){
         const accmin = accounts.filter(a => a.balance >=  minbalance)
         return res.status(200).json({accounts_minbalanced: accmin })
+        const users = await User.find({balance: {$gte : minbalance}})
+        .select("name username role balance")
+        .sort({balance : -1})
     }
    const all = accounts.map(acc =>({
     name :acc.name ,
     balance: acc.balance
    }))
-    return res.json({massege : all})
+
+        const users =await User.find()
+        .select("name username role balance")
+        .sort({balance : -1})
+    return res.json({massege : all, users:users})
 })
 
 app.get("/api/account/:id",(req,res)=>{
@@ -55,10 +64,11 @@ app.get("/api/account/:id",(req,res)=>{
 })
 
 app.post("/api/account", (req,res)=>{
-    const {name, balance}= req.body;
+    const {name, balance, username , password}= req.body;
     if (balance < 0) {
         return res.json({massge: "Sorry the money should be 0 or more"})
     }
+
     accounts.push({
         id:accounts.length + 1,
         name ,
