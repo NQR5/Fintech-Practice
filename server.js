@@ -63,19 +63,24 @@ app.get("/api/account/:id",(req,res)=>{
     return res.json({massge : `The account data is: name : ${account.name} -- id : ${account.id}  - balance : ${account.balance}`})   
 })
 
-app.post("/api/account", (req,res)=>{
-    const {name, balance, username , password}= req.body;
-    if (balance < 0) {
-        return res.json({massge: "Sorry the money should be 0 or more"})
+app.post("/api/account",async (req,res)=>{
+    const {name,  username , password}= req.body;
+
+    if(!name || !username || !password){
+         return res.status(400).json({massge: "Sorry can't add an account without username or name or password"})
     }
 
-    accounts.push({
-        id:accounts.length + 1,
-        name ,
-        balance
-
+    const exixt = await User.findOne({username})
+    if (exixt){
+        return res.status(400).json({massge: "the username is already signed in"})
+    }
+    const user =await   User.create({
+        username : username ,
+        name : name ,
+        password:password,
+       
     })
-    return res.json({massge : `The account has been created with name : ${name} and balance ${balance}  `})
+    return res.json({user:user})
 
 })
 
