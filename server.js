@@ -1,7 +1,9 @@
 import express from "express";
+import mongoose from "mongoose";
+import jwt from "jsonwebtoken"
 const app = express();
 const PORT = 3000
-
+const mon = mongoose.connect("mongodb://localhost:27017/test").then(()=>console.log("DB is ready"))
 app.use(express.json());
 
 let accounts = [
@@ -14,7 +16,7 @@ let accounts = [
     {
         id:2,
         name:"Bander",
-        balance: 250
+        balance: 250    
     },
 
     {
