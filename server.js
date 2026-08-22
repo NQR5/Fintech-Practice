@@ -54,13 +54,16 @@ app.get("/api/accounts",async (req,res)=>{
     return res.json({massege : all, users:users})
 })
 
-app.get("/api/account/:id",(req,res)=>{
+app.get("/api/account/:id",async(req,res)=>{
     const Id = req.params.id
     const account = accounts.find(acc=>  acc.id == Id)
-    if(!account){
+    const acc = await User.findById(Id)
+
+
+    if(!acc){
         return res.json({massge : "The account is not here "})
     }
-    return res.json({massge : `The account data is: name : ${account.name} -- id : ${account.id}  - balance : ${account.balance}`})   
+    return res.json(acc)   
 })
 
 app.post("/api/account",async (req,res)=>{
