@@ -56,7 +56,6 @@ app.get("/api/accounts",async (req,res)=>{
 
 app.get("/api/account/:id",async(req,res)=>{
     const Id = req.params.id
-    const account = accounts.find(acc=>  acc.id == Id)
     const acc = await User.findById(Id)
 
 
@@ -117,9 +116,10 @@ app.put("/api/accounts/:id/withdraw", (req,res )=>{
 app.delete("/api/accounts/:id",(req,res)=>{
     const Id = req.params.id;
     const acc = accounts.find(a => a.id== Id);
-    if(acc ){
-       accounts = accounts.filter(acc => acc.id != Id )
-       return res.status(200).json({massege: `the delete is Done with this account id: ${acc.id} and name : ${acc.name}`}) 
+    const accountFind = User.findById(Id)
+    if(accountFind ){
+       User.findByIdAndDelete(Id)
+       return res.status(200).json({massege: `the delete is Done with this account id: ${accountFind.id} and name : ${accountFind.name}`}) 
     }
     return res.status(400).json({massege: `Not Found`})
 })
